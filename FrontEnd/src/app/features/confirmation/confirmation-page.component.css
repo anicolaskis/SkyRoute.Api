@@ -1,0 +1,99 @@
+/* ── Success banner ──────────────────────────────────────────────────────── */
+.success-banner {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: var(--radius);
+  padding: 28px 32px;
+  margin-bottom: 32px;
+}
+
+.success-icon {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--color-success);
+  background: #dcfce7;
+  border-radius: 50%;
+  width: 64px;
+  height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.success-banner h1 {
+  margin: 0 0 4px;
+  font-size: 22px;
+  color: #14532d;
+}
+
+.success-banner p {
+  margin: 0 0 8px;
+  color: #166534;
+  font-size: 14px;
+}
+
+.reference-code {
+  font-size: 28px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  color: var(--color-success);
+  font-family: 'Courier New', monospace;
+  background: #dcfce7;
+  padding: 4px 12px;
+  border-radius: 4px;
+}
+
+/* ── Details card ────────────────────────────────────────────────────────── */
+.details-card {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  margin: 0 0 20px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.details-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.detail-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.status-confirmed {
+  color: var(--color-success);
+}
+
+.total-paid {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+/* ── CTA ─────────────────────────────────────────────────────────────────── */
+.cta {
+  display: flex;
+  justify-content: center;
+}

@@ -1,0 +1,174 @@
+<div class="page-container">
+
+  <!-- ── Header ──────────────────────────────────────────────────────────── -->
+  <header class="page-header">
+    <h1>✈ SkyRoute</h1>
+    <p class="subtitle">Search and compare flights from multiple airlines</p>
+  </header>
+
+  <!-- ── Search Form ─────────────────────────────────────────────────────── -->
+  <section class="card search-card">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-grid">
+
+        <!-- Origin -->
+        <div class="form-group">
+          <label for="origin">From</label>
+          <select id="origin" formControlName="origin"
+                  [class.is-invalid]="isFieldInvalid('origin')">
+            <option value="">Select airport</option>
+            @for (airport of airports; track airport.code) {
+              <option [value]="airport.code">{{ airport.name }} ({{ airport.code }})</option>
+            }
+          </select>
+          @if (isFieldInvalid('origin')) {
+            <span class="field-error">Please select an origin airport.</span>
+          }
+        </div>
+
+        <!-- Destination -->
+        <div class="form-group">
+          <label for="destination">To</label>
+          <select id="destination" formControlName="destination"
+                  [class.is-invalid]="isFieldInvalid('destination')">
+            <option value="">Select airport</option>
+            @for (airport of airports; track airport.code) {
+              <option [value]="airport.code">{{ airport.name }} ({{ airport.code }})</option>
+            }
+          </select>
+          @if (isFieldInvalid('destination')) {
+            <span class="field-error">Please select a destination airport.</span>
+          }
+        </div>
+
+        <!-- Departure Date -->
+        <div class="form-group">
+          <label for="departureDate">Departure date</label>
+          <input id="departureDate" type="date" formControlName="departureDate"
+                 [min]="minDate"
+                 [class.is-invalid]="isFieldInvalid('departureDate')">
+          @if (isFieldInvalid('departureDate')) {
+            <span class="field-error">Please select a departure date.</span>
+          }
+        </div>
+
+        <!-- Passengers -->
+        <div class="form-group">
+          <label for="passengers">Passengers</label>
+          <select id="passengers" formControlName="passengers">
+            @for (n of passengerOptions; track n) {
+              <option [value]="n">{{ n }} {{ n === 1 ? 'passenger' : 'passengers' }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- Cabin Class -->
+        <div class="form-group">
+          <label for="cabinClass">Cabin class</label>
+          <select id="cabinClass" formControlName="cabinClass">
+            @for (cabin of cabinClasses; track cabin) {
+              <option [value]="cabin">{{ cabin }}</option>
+            }
+          </select>
+        </div>
+
+      </div><!-- /form-grid -->
+
+      <!-- Error message (same-airport, network, etc.) -->
+      @if (errorMessage()) {
+        <p class="form-error-banner">⚠ {{ errorMessage() }}</p>
+      }
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading()">
+          @if (isLoading()) { Searching... } @else { Search flights }
+        </button>
+      </div>
+
+    </form>
+  </section>
+
+  <!-- ── Results ──────────────────────────────────────────────────────────── -->
+  @if (isLoading()) {
+    <!-- Loading state -->
+    <div class="state-message">
+      <div class="spinner"></div>
+      <p>Searching all providers for the best flights…</p>
+    </div>
+  }
+
+  @if (!isLoading() && hasSearched()) {
+
+    @if (sortedResults().length === 0) {
+      <!-- Empty state -->
+      <div class="state-message">
+        <span class="empty-icon">🔍</span>
+        <p>No flights found for this route and date. Try a different search.</p>
+      </div>
+    } @else {
+      <!-- Sort controls + results table -->
+      <section class="results-section">
+        <div class="results-header">
+          <h2>{{ sortedResults().length }} flight{{ sortedResults().length === 1 ? '' : 's' }} found</h2>
+          <div class="sort-controls">
+            <label for="sortKey">Sort by</label>
+            <select id="sortKey" (change)="onSortChange($any($event.target).value)">
+              <option value="price-asc">Price: low to high</option>
+              <option value="price-desc">Price: high to low</option>
+              <option value="duration">Shortest duration</option>
+              <option value="departure">Earliest departure</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="results-list">
+          @for (offer of sortedResults(); track offer.flightOffer.flightNumber) {
+            <div class="flight-card card">
+
+              <!-- Left: provider + flight number -->
+              <div class="flight-provider">
+                <span class="provider-name">{{ offer.flightOffer.provider }}</span>
+                <span class="flight-number">{{ offer.flightOffer.flightNumber }}</span>
+                <span class="cabin-badge">{{ offer.flightOffer.cabinClass }}</span>
+              </div>
+
+              <!-- Center: times + duration -->
+              <div class="flight-times">
+                <div class="time-block">
+                  <span class="time">{{ offer.flightOffer.departureTime | date:'HH:mm' }}</span>
+                  <span class="airport">{{ offer.flightOffer.origin }}</span>
+                  <span class="arrival-date">{{ offer.flightOffer.departureTime | date:'MMM d' }}</span>
+                </div>
+                <div class="duration-block">
+                  <span class="duration-line"></span>
+                  <span class="duration-label">{{ offer.flightOffer.duration | duration }}</span>
+                </div>
+                <div class="time-block">
+                  <span class="time">{{ offer.flightOffer.arrivalTime | date:'HH:mm' }}</span>
+                  <span class="airport">{{ offer.flightOffer.destination }}</span>
+                  <span class="arrival-date">{{ offer.flightOffer.arrivalTime | date:'MMM d' }}</span>
+                </div>
+              </div>
+
+              <!-- Right: price + book button -->
+              <div class="flight-price">
+                <span class="total-price">
+                  {{ offer.currency }} {{ offer.totalPrice | number:'1.2-2' }} total
+                </span>
+                <span class="per-pax">
+                  {{ offer.currency }} {{ offer.pricePerPassenger | number:'1.2-2' }} / person
+                </span>
+                <button class="btn btn-primary" (click)="onSelectFlight(offer)">
+                  Select
+                </button>
+              </div>
+
+            </div><!-- /flight-card -->
+          }
+        </div><!-- /results-list -->
+      </section>
+    }
+
+  }
+
+</div><!-- /page-container -->

@@ -1,0 +1,122 @@
+.back-btn {
+  margin-bottom: 24px;
+}
+
+/* ── Flight summary ──────────────────────────────────────────────────────── */
+.summary-card {
+  margin-bottom: 24px;
+}
+
+.section-title {
+  margin: 0 0 16px;
+  font-size: 17px;
+  font-weight: 600;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.label {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+  color: var(--color-text-muted);
+  font-weight: 500;
+}
+
+.value {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ── Price breakdown ─────────────────────────────────────────────────────── */
+.price-breakdown {
+  border-top: 1px solid var(--color-border);
+  padding-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-width: 320px;
+  margin-left: auto;
+}
+
+.price-row {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  color: var(--color-text-muted);
+}
+
+.price-row.total {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--color-text);
+  border-top: 1px solid var(--color-border);
+  padding-top: 8px;
+  margin-top: 4px;
+}
+
+/* ── Document notice ─────────────────────────────────────────────────────── */
+.doc-notice {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  color: #166534;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+
+.doc-notice.international {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+  color: #1e40af;
+}
+
+/* ── Passenger card ──────────────────────────────────────────────────────── */
+.passenger-card {
+  margin-bottom: 16px;
+}
+
+.passenger-title {
+  margin: 0 0 16px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-text-muted);
+}
+
+.passenger-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 16px;
+}
+
+/* ── Error + submit ──────────────────────────────────────────────────────── */
+.form-error-banner {
+  color: var(--color-danger);
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin: 16px 0;
+  font-size: 13px;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 8px;
+}

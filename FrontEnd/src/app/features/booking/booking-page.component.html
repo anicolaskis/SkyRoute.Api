@@ -1,0 +1,147 @@
+<div class="page-container">
+
+  <button class="btn btn-secondary back-btn" (click)="onBack()">← Back to results</button>
+
+  @if (offer(); as flight) {
+
+    <!-- ── Flight Summary ──────────────────────────────────────────────── -->
+    <section class="card summary-card">
+      <h2 class="section-title">Selected flight</h2>
+
+      <div class="summary-grid">
+        <div class="summary-item">
+          <span class="label">Airline</span>
+          <span class="value">{{ flight.flightOffer.provider }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Flight</span>
+          <span class="value">{{ flight.flightOffer.flightNumber }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Route</span>
+          <span class="value">{{ flight.flightOffer.origin }} → {{ flight.flightOffer.destination }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Departure</span>
+          <span class="value">{{ flight.flightOffer.departureTime | date:'EEE, MMM d • HH:mm' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Arrival</span>
+          <span class="value">{{ flight.flightOffer.arrivalTime | date:'HH:mm' }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Duration</span>
+          <span class="value">{{ flight.flightOffer.duration | duration }}</span>
+        </div>
+        <div class="summary-item">
+          <span class="label">Cabin</span>
+          <span class="value">{{ flight.flightOffer.cabinClass }}</span>
+        </div>
+      </div>
+
+      <!-- Price breakdown -->
+      <div class="price-breakdown">
+        <div class="price-row">
+          <span>Price per passenger</span>
+          <span>{{ flight.currency }} {{ flight.pricePerPassenger | number:'1.2-2' }}</span>
+        </div>
+        <div class="price-row">
+          <span>Passengers</span>
+          <span>× {{ passengerCount() }}</span>
+        </div>
+        <div class="price-row total">
+          <span>Total</span>
+          <span>{{ flight.currency }} {{ flight.totalPrice | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── Passenger Forms ─────────────────────────────────────────────── -->
+    <form [formGroup]="bookingForm" (ngSubmit)="onConfirm()">
+
+      <!-- Document type notice -->
+      <div class="doc-notice" [class.international]="isInternational">
+        @if (isInternational) {
+          🌍 <strong>International route</strong> — a valid <strong>Passport</strong> is required for each passenger.
+        } @else {
+          🏠 <strong>Domestic route</strong> — a <strong>National ID</strong> is required for each passenger.
+        }
+      </div>
+
+      <div formArrayName="passengers">
+        @for (passengerGroup of passengersArray.controls; track $index; let i = $index) {
+          <section class="card passenger-card" [formGroupName]="$index">
+            <h3 class="passenger-title">Passenger {{ i + 1 }}</h3>
+
+            <div class="passenger-grid">
+
+              <div class="form-group">
+                <label [for]="'firstName-' + i">First name</label>
+                <input [id]="'firstName-' + i" type="text" formControlName="firstName"
+                       [class.is-invalid]="isFieldInvalid(passengerGroup, 'firstName')">
+                @if (isFieldInvalid(passengerGroup, 'firstName')) {
+                  <span class="field-error">{{ getFieldError(passengerGroup, 'firstName') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label [for]="'lastName-' + i">Last name</label>
+                <input [id]="'lastName-' + i" type="text" formControlName="lastName"
+                       [class.is-invalid]="isFieldInvalid(passengerGroup, 'lastName')">
+                @if (isFieldInvalid(passengerGroup, 'lastName')) {
+                  <span class="field-error">{{ getFieldError(passengerGroup, 'lastName') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label [for]="'email-' + i">Email address</label>
+                <input [id]="'email-' + i" type="email" formControlName="email"
+                       placeholder="passenger@email.com"
+                       [class.is-invalid]="isFieldInvalid(passengerGroup, 'email')">
+                @if (isFieldInvalid(passengerGroup, 'email')) {
+                  <span class="field-error">{{ getFieldError(passengerGroup, 'email') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label [for]="'dob-' + i">Date of birth</label>
+                <input [id]="'dob-' + i" type="date" formControlName="dateOfBirth"
+                       [max]="maxDob"
+                       [class.is-invalid]="isFieldInvalid(passengerGroup, 'dateOfBirth')">
+                @if (isFieldInvalid(passengerGroup, 'dateOfBirth')) {
+                  <span class="field-error">{{ getFieldError(passengerGroup, 'dateOfBirth') }}</span>
+                }
+              </div>
+
+              <div class="form-group">
+                <label [for]="'doc-' + i">{{ documentLabel }}</label>
+                <input [id]="'doc-' + i" type="text" formControlName="documentNumber"
+                       [placeholder]="isInternational ? '6–12 characters' : '5+ digits'"
+                       [class.is-invalid]="isFieldInvalid(passengerGroup, 'documentNumber')">
+                @if (isFieldInvalid(passengerGroup, 'documentNumber')) {
+                  <span class="field-error">{{ getFieldError(passengerGroup, 'documentNumber') }}</span>
+                }
+              </div>
+
+            </div><!-- /passenger-grid -->
+          </section>
+        }
+      </div><!-- /formArrayName -->
+
+      <!-- API error -->
+      @if (errorMessage()) {
+        <p class="form-error-banner">⚠ {{ errorMessage() }}</p>
+      }
+
+      <!-- Submit -->
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary" [disabled]="isSubmitting()">
+          @if (isSubmitting()) { Confirming… } @else { Confirm booking }
+        </button>
+      </div>
+
+    </form>
+
+  }
+
+</div>

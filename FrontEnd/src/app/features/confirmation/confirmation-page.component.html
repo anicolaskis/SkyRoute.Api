@@ -1,0 +1,62 @@
+<div class="page-container">
+
+  @if (booking(); as b) {
+
+    <!-- ── Success banner ──────────────────────────────────────────────── -->
+    <div class="success-banner">
+      <span class="success-icon">✓</span>
+      <div>
+        <h1>Booking confirmed!</h1>
+        <p>Your booking reference is</p>
+        <span class="reference-code">{{ b.referenceCode }}</span>
+      </div>
+    </div>
+
+    <!-- ── Flight details ──────────────────────────────────────────────── -->
+    <section class="card details-card">
+      <h2 class="section-title">Flight details</h2>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">Airline</span>
+          <span class="value">{{ b.provider }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Flight number</span>
+          <span class="value">{{ b.flightNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Route</span>
+          <span class="value">{{ b.origin }} → {{ b.destination }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Departure</span>
+          <span class="value">{{ b.departureTime | date:'EEE, MMM d • HH:mm' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Arrival</span>
+          <span class="value">{{ b.arrivalTime | date:'EEE, MMM d • HH:mm' }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Cabin</span>
+          <span class="value">{{ b.cabinClass }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Status</span>
+          <span class="value status-confirmed">{{ b.status }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Total paid</span>
+          <span class="value total-paid">{{ b.currency }} {{ b.totalPrice | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── CTA ──────────────────────────────────────────────────────────── -->
+    <div class="cta">
+      <button class="btn btn-primary" (click)="onSearchAgain()">Search new flights</button>
+    </div>
+
+  }
+
+</div>
