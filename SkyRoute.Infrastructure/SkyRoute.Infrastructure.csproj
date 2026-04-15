@@ -5,6 +5,15 @@
     <ProjectReference Include="..\SkyRoute.Application\SkyRoute.Application.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="MockData\budgetwings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+    <None Update="MockData\globalair.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
   <PropertyGroup>
     <TargetFramework>net10.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
