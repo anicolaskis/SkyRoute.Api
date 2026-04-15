@@ -6,7 +6,9 @@ namespace SkyRoute.Domain.Abstractions;
 // It remains DECOUPLED from the provider: the provider returns the base price,
 // the strategy transforms it into the final price.
 // Each strategy exposes the ProviderName it applies to so the service can match it.
-public interface IPricingStrategy<T> where T : class
+public interface IPricingStrategy
 {
+    string ProviderName { get; }
+
     decimal CalculateFinalPrice(decimal basePrice, int passengers, CabinClass cabin);
 }

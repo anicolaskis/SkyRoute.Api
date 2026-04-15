@@ -7,11 +7,17 @@ namespace SkyRoute.Infrastructure.Providers;
 // Mock provider for "GlobalAir".
 // Inherits from MockFlightProvider and only provides the Name.
 // Data comes from the injected IMockFlightDataSource (typically globalair.json).
-public class GlobalAirProvider : MockFlightProvider
+public class GlobalAirProvider : IFlightProvider
 {
-    public GlobalAirProvider(IMockFlightDataSource dataSource) : base(dataSource)
+    public string ProviderName => "GlobalAir";
+
+    private IMockFlightProvider _mockFlightProvider;
+
+    public GlobalAirProvider(IMockFlightProvider mockFlightProvider)
     {
+        _mockFlightProvider = mockFlightProvider;
     }
 
-    public override string ProviderName => "GlobalAir";
+    public Task<IEnumerable<FlightOffer>> SearchAsync(SearchCriteria searchCriteria, CancellationToken ct = default)
+        => Task.FromResult(_mockFlightProvider.GetFlightOffers(searchCriteria, ProviderName));
 }

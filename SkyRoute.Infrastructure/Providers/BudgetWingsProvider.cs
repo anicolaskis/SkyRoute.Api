@@ -9,25 +9,15 @@ namespace SkyRoute.Infrastructure.Providers;
 // Data comes from the injected IMockFlightDataSource (typically budgetwings.json).
 public class BudgetWingsProvider : IFlightProvider
 {
-    private IPricingStrategy<BudgetWingsProvider> _pricingStrategy;
-    private IMockFlightProvider _mockFlightProvider;
-
     public string ProviderName => "BudgetWings";
 
-    public BudgetWingsProvider(IPricingStrategy<BudgetWingsProvider> pricingStrategy, IMockFlightProvider mockFlightProvider)
+    private IMockFlightProvider _mockFlightProvider;
+
+    public BudgetWingsProvider(IMockFlightProvider mockFlightProvider)
     {
-        _pricingStrategy = pricingStrategy;
         _mockFlightProvider = mockFlightProvider;
     }
 
     public Task<IEnumerable<FlightOffer>> SearchAsync(SearchCriteria searchCriteria, CancellationToken ct = default)
-    {
-        var flightOffersTemplate = _mockFlightProvider.GetFlightOffers(searchCriteria, ProviderName);
-
-        var 
-        _pricingStrategy.CalculateFinalPrice()
-
-
-        throw new NotImplementedException();
-    }
+        =>Task.FromResult(_mockFlightProvider.GetFlightOffers(searchCriteria, ProviderName));
 }

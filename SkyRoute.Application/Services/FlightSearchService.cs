@@ -1,3 +1,5 @@
+using SkyRoute.Application.Abstractions;
+using SkyRoute.Domain.Abstractions;
 using SkyRoute.Domain.Models;
 
 namespace SkyRoute.Application.Services;
@@ -13,8 +15,43 @@ namespace SkyRoute.Application.Services;
 //   4. Returns the unified list ordered by price.
 public class FlightSearchService : IFlightSearchService
 {
-    public Task<IEnumerable<PricedFlightOffer>> SearchFlightsOnProviders(SearchCriteria criteria, CancellationToken ct = default)
+    private readonly IEnumerable<IFlightProvider> _providers;
+    private readonly IPricingStrategyResolver _pricingStrategyResolver;
+
+    public FlightSearchService(
+        IEnumerable<IFlightProvider> providers,
+        IPricingStrategyResolver pricingStrategyResolver)
     {
-        throw new NotImplementedException();
+        _providers = providers;
+        _pricingStrategyResolver = pricingStrategyResolver;
     }
+
+    public async Task<IEnumerable<PricedFlightOffer>> SearchFlightsOnProviders(SearchCriteria criteria, CancellationToken ct = default)
+    {
+        var tasks = _providers.Select(p => SafeSearchAsync(p, criteria, ct));
+        var resultsPerProvider = await Task.WhenAll(tasks);
+
+        return resultsPerProvider
+            .SelectMany(x => x)
+            .Select(offer => Price(offer, criteria.Passengers, criteria.CabinClass))
+            .OrderBy(p => p.TotalPrice);
+    }
+
+    private static async Task<IEnumerable<FlightOffer>> SafeSearchAsync(IFlightProvider provider, SearchCriteria criteria, CancellationToken ct)
+    {
+        try { return await provider.SearchAsync(criteria, ct); }
+        catch { return Array.Empty<FlightOffer>(); } // 1 provider caído no rompe la búsqueda
+    }
+
+    private PricedFlightOffer Price(FlightOffer offer, int passengers, CabinClass cabin)
+    {
+        var strategy = _pricingStrategyResolver.Get(offer.Provider) ?? throw new InvalidOperationException($"No pricing strategy for provider '{offer.Provider}'.");
+
+        var total = strategy.CalculateFinalPrice(offer.BasePrice, passengers, cabin);
+        
+        var perPax = Math.Round(total / passengers, 2);
+        
+        return new PricedFlightOffer(offer, total, perPax, "USD");
+    }
+
 }
