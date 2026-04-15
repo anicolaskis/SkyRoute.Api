@@ -10,12 +10,8 @@ public class JsonMockFlightDataSource : IMockFlightDataSource
 {
     private readonly List<FlightTemplate> _templates;
 
-    public string ProviderName { get; }
-
-    public JsonMockFlightDataSource(string providerName, string jsonFilePath)
+    public JsonMockFlightDataSource(string jsonFilePath)
     {
-        ProviderName = providerName;
-
         if (!File.Exists(jsonFilePath))
             throw new FileNotFoundException($"Mock data file not found: {jsonFilePath}");
 

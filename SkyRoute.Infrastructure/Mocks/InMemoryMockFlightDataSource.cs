@@ -7,11 +7,8 @@ public class InMemoryMockFlightDataSource : IMockFlightDataSource
 {
     private readonly IReadOnlyList<FlightTemplate> _templates;
 
-    public string ProviderName { get; }
-
-    public InMemoryMockFlightDataSource(string providerName, IEnumerable<FlightTemplate> templates)
+    public InMemoryMockFlightDataSource(IEnumerable<FlightTemplate> templates)
     {
-        ProviderName = providerName;
         _templates = templates.ToList();
     }
 

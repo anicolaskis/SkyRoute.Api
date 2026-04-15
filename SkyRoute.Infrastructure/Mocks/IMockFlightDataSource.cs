@@ -8,7 +8,5 @@ namespace SkyRoute.Infrastructure.Mocks;
 // implementations: from JSON, in-memory, random, or even a fake HTTP.
 public interface IMockFlightDataSource
 {
-    public string ProviderName { get; }
-
     IEnumerable<FlightTemplate> GetTemplates();
 }
