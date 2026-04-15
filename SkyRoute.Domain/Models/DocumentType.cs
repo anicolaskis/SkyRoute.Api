@@ -4,5 +4,6 @@ namespace SkyRoute.Domain.Models;
 // International => Passport, Domestic => NationalId (challenge rule).
 public enum DocumentType
 {
-    // Values pending implementation.
+    Passport,
+    NationalId
 }

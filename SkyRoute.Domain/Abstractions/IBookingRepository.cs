@@ -1,3 +1,5 @@
+using SkyRoute.Domain.Models;
+
 namespace SkyRoute.Domain.Abstractions;
 
 // Persistence for bookings. Abstraction over storage:
@@ -5,5 +7,7 @@ namespace SkyRoute.Domain.Abstractions;
 // Domain defines the contract; Infrastructure implements it.
 public interface IBookingRepository
 {
-    // Pending members: AddAsync(booking), GetByIdAsync(id).
+    Task AddBooking(Booking booking, CancellationToken ct = default);
+
+    Task<Booking?> GetByBookingId(string id, CancellationToken ct = default);
 }

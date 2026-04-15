@@ -2,8 +2,13 @@ namespace SkyRoute.Domain.Models;
 
 // Confirmed booking. Aggregates flight + passengers + totals + reference.
 // Record: a created booking should not mutate (in v2, changes would generate a new event).
-public record Booking
-{
-    // Pending properties: Id, ReferenceCode, Flight, Passengers, TotalPrice,
-    // Currency, Status, CreatedAt.
-}
+public record Booking(
+    string Id,
+    string ReferenceCode,
+    FlightOffer Flight,
+    IReadOnlyList<Passenger> Passengers,
+    decimal TotalPrice,
+    string Currency,
+    BookingStatus Status,
+    DateTime CreatedAt
+);

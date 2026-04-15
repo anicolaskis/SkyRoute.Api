@@ -1,7 +1,9 @@
+using SkyRoute.Application.Dtos;
+
 namespace SkyRoute.Application.Abstractions;
 
 // Use case: create a booking from the selected flight and passengers.
 public interface IBookingService
 {
-    // Pending member: CreateAsync(request, ct).
+    Task<BookingResponse> CreateBooking(BookingRequest request, CancellationToken ct = default);
 }

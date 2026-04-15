@@ -1,3 +1,5 @@
+using SkyRoute.Domain.Models;
+
 namespace SkyRoute.Domain.Abstractions;
 
 // Validates a passenger's document based on the route:
@@ -6,5 +8,5 @@ namespace SkyRoute.Domain.Abstractions;
 // If the rule changes in the future (e.g., Mercosur accepts DNI), ONLY the validator is modified.
 public interface IDocumentValidator
 {
-    // Pending member: Validate(documentNumber, providedType, originCountry, destinationCountry).
+    DocumentValidationResult Validate(string documentNumber, DocumentType providedType, string originCountry, string destinationCountry);
 }
