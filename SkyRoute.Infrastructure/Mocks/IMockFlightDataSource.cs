@@ -1,5 +1,3 @@
-using SkyRoute.Domain.Abstractions;
-
 namespace SkyRoute.Infrastructure.Mocks;
 
 // Simulated flight data source.

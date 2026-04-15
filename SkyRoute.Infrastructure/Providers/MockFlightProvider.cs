@@ -1,5 +1,3 @@
-using Microsoft.Extensions.DependencyInjection;
-using SkyRoute.Domain.Abstractions;
 using SkyRoute.Domain.Models;
 using SkyRoute.Infrastructure.Mocks;
 
@@ -15,7 +13,7 @@ public class MockFlightProvider : IMockFlightProvider
         var flightsTemplate = mockFlightDataSource.GetTemplates();
         var offers = new List<FlightOffer>();
 
-        foreach(var flightTemplate in flightsTemplate)
+        foreach (var flightTemplate in flightsTemplate)
         {
             var departure = searchCriteria.DepartureDate.Date.AddHours(flightTemplate.DepartureHourOffset);
             var arrival = departure.AddHours(flightTemplate.DurationHours);

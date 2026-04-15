@@ -89,7 +89,7 @@ public class FlightSearchService : IFlightSearchService
                 $"No pricing strategy registered for provider '{offer.Provider}'. " +
                 "Register an IPricingStrategy with a matching ProviderName in Program.cs.");
 
-        var total  = strategy.CalculateFinalPrice(offer.BasePrice, passengers, cabin);
+        var total = strategy.CalculateFinalPrice(offer.BasePrice, passengers, cabin);
         var perPax = Math.Round(total / passengers, 2);
 
         _logger.LogDebug(
