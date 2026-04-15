@@ -1,12 +1,11 @@
 namespace SkyRoute.Domain.Models;
 
-// Flight offer with the final price ALREADY calculated by the corresponding IPricingStrategy.
-// This is what the FlightSearchService returns to the client.
-// Separated from FlightOffer so that the "pricing rule" is explicit in the type.
+/// <summary>
+/// Flight offer with the final price ALREADY calculated by the corresponding IPricingStrategy.
+/// Separated from FlightOffer so the pricing transformation is explicit in the type system.
+/// </summary>
 public record PricedFlightOffer(
     FlightOffer FlightOffer,
     decimal TotalPrice,
     decimal PricePerPassenger,
-    string Currency);
-
-// TODO: change currency to validated enum
+    Currency Currency);

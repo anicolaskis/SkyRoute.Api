@@ -8,7 +8,7 @@ public record Booking(
     FlightOffer Flight,
     IReadOnlyList<Passenger> Passengers,
     decimal TotalPrice,
-    string Currency,
+    Currency Currency,
     BookingStatus Status,
     DateTime CreatedAt
 );

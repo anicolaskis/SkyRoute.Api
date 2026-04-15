@@ -5,69 +5,93 @@ using SkyRoute.Domain.Models;
 
 namespace SkyRoute.Application.Services;
 
-// Implementation of the booking use case.
-// Responsibilities:
-//   - Validate that there are passengers.
-//   - Validate each document with IDocumentValidator based on the route.
-//   - Construct the Booking entity.
-//   - Persist via IBookingRepository.
-// Does NOT contain pricing rules (the strategy does that during search).
-// Future: re-query the provider to ensure availability before confirming.
+/// <summary>
+/// Booking use case orchestrator.
+/// Responsibilities:
+///   - Validate that at least one passenger is present.
+///   - Validate each passenger's document via IDocumentValidator (route-aware).
+///   - Construct the Booking entity using the price and times supplied by the client
+///     (already computed during the search step — no re-pricing needed here).
+///   - Persist via IBookingRepository.
+/// </summary>
 public class BookingService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
-    private readonly IDocumentValidator _passengerDocumentValidator;
+    private readonly IDocumentValidator _documentValidator;
 
-    public BookingService(IBookingRepository bookingRepository, IDocumentValidator passengerDocumentValidator)
+    public BookingService(IBookingRepository bookingRepository, IDocumentValidator documentValidator)
     {
         _bookingRepository = bookingRepository;
-        _passengerDocumentValidator = passengerDocumentValidator;
+        _documentValidator = documentValidator;
     }
 
-    public async Task<BookingResponse> CreateBooking(BookingRequest bookingRequest, CancellationToken ct = default)
+    public async Task<BookingResponse> CreateBooking(BookingRequest request, CancellationToken ct = default)
     {
-        if (bookingRequest.Passengers.Count == 0)
+        if (request.Passengers.Count == 0)
             throw new ArgumentException("At least one passenger is required.");
 
-        // Validación de documento por ruta (internacional vs doméstica).
-        var originCountry = bookingRequest.Origin[..2];
-        var destCountry = bookingRequest.Destination[..2];
-
-        foreach (var p in bookingRequest.Passengers)
-        {
-            var result = _passengerDocumentValidator.Validate(p.DocumentNumber, p.DocumentType, originCountry, destCountry);
-            if (!result.IsValid)
-                throw new ArgumentException(result.Error ?? "Invalid document.");
-        }
+        ValidatePassengerDocuments(request);
 
         var flight = new FlightOffer(
-            Provider: bookingRequest.Provider,
-            FlightNumber: bookingRequest.FlightNumber,
-            Origin: bookingRequest.Origin,
-            Destination: bookingRequest.Destination,
-            DepartureTime: bookingRequest.DepartureTime,
-            ArrivalTime: bookingRequest.DepartureTime.AddHours(2), // placeholder, lo ideal es re-consultar al provider
-            CabinClass: bookingRequest.CabinClass,
+            Provider: request.Provider,
+            FlightNumber: request.FlightNumber,
+            Origin: request.Origin,
+            Destination: request.Destination,
+            DepartureTime: request.DepartureTime,
+            // ArrivalTime now comes from the client (selected from real search results).
+            ArrivalTime: request.ArrivalTime,
+            CabinClass: request.CabinClass,
+            // BasePrice is not relevant for the booking confirmation; TotalPrice is used.
             BasePrice: 0m);
 
-        var passengers = bookingRequest.Passengers
+        var passengers = request.Passengers
             .Select(p => new Passenger(p.FirstName, p.LastName, p.DateOfBirth, p.DocumentType, p.DocumentNumber))
             .ToList();
 
         var booking = new Booking(
             Id: Guid.NewGuid().ToString(),
-            ReferenceCode: Guid.NewGuid().ToString("N")[..8].ToUpperInvariant(),
+            ReferenceCode: GenerateReferenceCode(),
             Flight: flight,
             Passengers: passengers,
-            // TODO: why not recalculate now with the strategies I already have?
-            TotalPrice: 0m, // en una implementación real se recalcula con la strategy del provider
-            // TODO: dont write it create an enum with posible currencies (in this case only USD)
-            Currency: "USD",
+            TotalPrice: request.TotalPrice,
+            Currency: request.Currency,
             Status: BookingStatus.Confirmed,
             CreatedAt: DateTime.UtcNow);
 
         await _bookingRepository.AddBooking(booking, ct);
 
-        return new BookingResponse(booking.Id, booking.ReferenceCode, booking.TotalPrice, booking.Currency, booking.Status.ToString());
+        return new BookingResponse(
+            booking.Id,
+            booking.ReferenceCode,
+            booking.Flight.Provider,
+            booking.Flight.FlightNumber,
+            booking.Flight.Origin,
+            booking.Flight.Destination,
+            booking.Flight.DepartureTime,
+            booking.Flight.ArrivalTime,
+            booking.Flight.CabinClass,
+            booking.TotalPrice,
+            booking.Currency,
+            booking.Status.ToString());
     }
+
+    // ── Private helpers ────────────────────────────────────────────────────────
+
+    private void ValidatePassengerDocuments(BookingRequest request)
+    {
+        foreach (var passenger in request.Passengers)
+        {
+            var result = _documentValidator.Validate(
+                passenger.DocumentNumber,
+                passenger.DocumentType,
+                request.Origin,
+                request.Destination);
+
+            if (!result.IsValid)
+                throw new ArgumentException(result.Error ?? "Invalid document.");
+        }
+    }
+
+    private static string GenerateReferenceCode() =>
+        Guid.NewGuid().ToString("N")[..8].ToUpperInvariant();
 }
