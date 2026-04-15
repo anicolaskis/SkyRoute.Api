@@ -1,3 +1,4 @@
+using Microsoft.Extensions.DependencyInjection;
 using SkyRoute.Domain.Abstractions;
 using SkyRoute.Domain.Models;
 using SkyRoute.Infrastructure.Mocks;
@@ -11,13 +12,16 @@ public class BudgetWingsProvider : IFlightProvider
 {
     public string ProviderName => "BudgetWings";
 
-    private IMockFlightProvider _mockFlightProvider;
+    private readonly IMockFlightProvider _mockFlightProvider;
+    private readonly IMockFlightDataSource _mockFlightDataSource;
 
-    public BudgetWingsProvider(IMockFlightProvider mockFlightProvider)
+    public BudgetWingsProvider(IMockFlightProvider mockFlightProvider, IServiceProvider _serviceProvider)
     {
         _mockFlightProvider = mockFlightProvider;
+        // TODO look correct way to hgandle this
+        _mockFlightDataSource = _serviceProvider.GetKeyedService<IMockFlightDataSource>(ProviderName);
     }
 
-    public Task<IEnumerable<FlightOffer>> SearchAsync(SearchCriteria searchCriteria, CancellationToken ct = default)
-        =>Task.FromResult(_mockFlightProvider.GetFlightOffers(searchCriteria, ProviderName));
+    public Task<IEnumerable<FlightOffer>> GetProvidersFlightOffers(SearchCriteria searchCriteria, CancellationToken ct = default)
+        =>Task.FromResult(_mockFlightProvider.GetFlightOffers(searchCriteria, ProviderName, _mockFlightDataSource));
 }

@@ -39,7 +39,7 @@ public class FlightSearchService : IFlightSearchService
 
     private static async Task<IEnumerable<FlightOffer>> SafeSearchAsync(IFlightProvider provider, SearchCriteria criteria, CancellationToken ct)
     {
-        try { return await provider.SearchAsync(criteria, ct); }
+        try { return await provider.GetProvidersFlightOffers(criteria, ct); }
         catch { return Array.Empty<FlightOffer>(); } // 1 provider caído no rompe la búsqueda
     }
 

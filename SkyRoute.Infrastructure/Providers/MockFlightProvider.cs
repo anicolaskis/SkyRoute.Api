@@ -7,21 +7,12 @@ namespace SkyRoute.Infrastructure.Providers;
 
 public class MockFlightProvider : IMockFlightProvider
 {
-    private readonly IServiceProvider _serviceProvider;
-
-    public MockFlightProvider(IServiceProvider serviceProvider)
+    public IEnumerable<FlightOffer> GetFlightOffers(SearchCriteria searchCriteria, string providerName, IMockFlightDataSource mockFlightDataSource)
     {
-        _serviceProvider = serviceProvider;
-    }
-
-    public IEnumerable<FlightOffer> GetFlightOffers(SearchCriteria searchCriteria, string providerName)
-    {
-        var dataSource = _serviceProvider.GetKeyedService<IMockFlightDataSource>(providerName);
-
-        if (dataSource == null)
+        if (mockFlightDataSource == null)
             throw new InvalidOperationException($"No mock data source found for provider '{providerName}'. Did you register it as a keyed service?");
 
-        var flightsTemplate = dataSource.GetTemplates();
+        var flightsTemplate = mockFlightDataSource.GetTemplates();
         var offers = new List<FlightOffer>();
 
         foreach(var flightTemplate in flightsTemplate)

@@ -10,5 +10,5 @@ public interface IFlightProvider
 {
     string ProviderName { get; }
 
-    Task<IEnumerable<FlightOffer>> SearchAsync(SearchCriteria criteria, CancellationToken ct = default);
+    Task<IEnumerable<FlightOffer>> GetProvidersFlightOffers(SearchCriteria criteria, CancellationToken ct = default);
 }
