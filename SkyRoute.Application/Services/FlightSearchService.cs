@@ -29,27 +29,55 @@ public class FlightSearchService : IFlightSearchService
         _logger = logger;
     }
 
-    public async Task<IEnumerable<PricedFlightOffer>> SearchFlightsOnProviders(SearchCriteria criteria, CancellationToken ct = default)
+    public async Task<IEnumerable<PricedFlightOffer>> SearchFlightsOnProviders(
+        SearchCriteria criteria, CancellationToken ct = default)
     {
+        _logger.LogInformation(
+            "Flight search started — route: {Origin} → {Destination}, date: {Date:yyyy-MM-dd}, passengers: {Passengers}, cabin: {Cabin}",
+            criteria.Origin, criteria.Destination,
+            criteria.DepartureDate, criteria.Passengers, criteria.CabinClass);
+
         var tasks = _providers.Select(p => SafeSearchAsync(p, criteria, ct));
         var resultsPerProvider = await Task.WhenAll(tasks);
 
-        return resultsPerProvider
+        var priced = resultsPerProvider
             .SelectMany(offers => offers)
             .Select(offer => ApplyPricing(offer, criteria.Passengers, criteria.CabinClass))
-            .OrderBy(p => p.TotalPrice);
+            .OrderBy(p => p.TotalPrice)
+            .ToList();
+
+        _logger.LogInformation(
+            "Flight search completed — route: {Origin} → {Destination}, results returned: {Count}",
+            criteria.Origin, criteria.Destination, priced.Count);
+
+        return priced;
     }
 
-    private async Task<IEnumerable<FlightOffer>> SafeSearchAsync(IFlightProvider provider, SearchCriteria criteria, CancellationToken ct)
+    // ── Private helpers ────────────────────────────────────────────────────────
+
+    private async Task<IEnumerable<FlightOffer>> SafeSearchAsync(
+        IFlightProvider provider, SearchCriteria criteria, CancellationToken ct)
     {
+        _logger.LogDebug("Querying provider '{Provider}'", provider.ProviderName);
+
         try
         {
-            return await provider.GetProvidersFlightOffers(criteria, ct);
+            var offers = (await provider.GetProvidersFlightOffers(criteria, ct)).ToList();
+
+            _logger.LogDebug(
+                "Provider '{Provider}' returned {Count} offer(s)",
+                provider.ProviderName, offers.Count);
+
+            return offers;
         }
         catch (Exception ex)
         {
-            // Log and degrade gracefully — a single provider failure should not block results from others.
-            _logger.LogWarning(ex, "Provider '{Provider}' failed during flight search. Excluding its results.", provider.ProviderName);
+            // Degrade gracefully: log the failure and exclude this provider's results.
+            // The search still returns offers from the remaining healthy providers.
+            _logger.LogWarning(ex,
+                "Provider '{Provider}' failed during flight search — its results will be excluded",
+                provider.ProviderName);
+
             return Array.Empty<FlightOffer>();
         }
     }
@@ -57,10 +85,16 @@ public class FlightSearchService : IFlightSearchService
     private PricedFlightOffer ApplyPricing(FlightOffer offer, int passengers, CabinClass cabin)
     {
         var strategy = _pricingStrategyResolver.Get(offer.Provider)
-            ?? throw new InvalidOperationException($"No pricing strategy registered for provider '{offer.Provider}'.");
+            ?? throw new InvalidOperationException(
+                $"No pricing strategy registered for provider '{offer.Provider}'. " +
+                "Register an IPricingStrategy with a matching ProviderName in Program.cs.");
 
-        var total = strategy.CalculateFinalPrice(offer.BasePrice, passengers, cabin);
+        var total  = strategy.CalculateFinalPrice(offer.BasePrice, passengers, cabin);
         var perPax = Math.Round(total / passengers, 2);
+
+        _logger.LogDebug(
+            "Pricing applied — flight: {FlightNumber}, provider: {Provider}, base: {Base:C}, total: {Total:C}, per pax: {PerPax:C}",
+            offer.FlightNumber, offer.Provider, offer.BasePrice, total, perPax);
 
         return new PricedFlightOffer(offer, total, perPax, Currency.USD);
     }

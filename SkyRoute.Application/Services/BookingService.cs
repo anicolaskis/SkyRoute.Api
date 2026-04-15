@@ -1,3 +1,4 @@
+using Microsoft.Extensions.Logging;
 using SkyRoute.Application.Abstractions;
 using SkyRoute.Application.Dtos;
 using SkyRoute.Domain.Abstractions;
@@ -18,17 +19,31 @@ public class BookingService : IBookingService
 {
     private readonly IBookingRepository _bookingRepository;
     private readonly IDocumentValidator _documentValidator;
+    private readonly ILogger<BookingService> _logger;
 
-    public BookingService(IBookingRepository bookingRepository, IDocumentValidator documentValidator)
+    public BookingService(
+        IBookingRepository bookingRepository,
+        IDocumentValidator documentValidator,
+        ILogger<BookingService> logger)
     {
         _bookingRepository = bookingRepository;
         _documentValidator = documentValidator;
+        _logger = logger;
     }
 
     public async Task<BookingResponse> CreateBooking(BookingRequest request, CancellationToken ct = default)
     {
+        _logger.LogInformation(
+            "Booking requested — flight: {FlightNumber}, provider: {Provider}, route: {Origin} → {Destination}, passengers: {PassengerCount}",
+            request.FlightNumber, request.Provider,
+            request.Origin, request.Destination,
+            request.Passengers.Count);
+
         if (request.Passengers.Count == 0)
+        {
+            _logger.LogWarning("Booking rejected — no passengers provided for flight {FlightNumber}", request.FlightNumber);
             throw new ArgumentException("At least one passenger is required.");
+        }
 
         ValidatePassengerDocuments(request);
 
@@ -38,11 +53,9 @@ public class BookingService : IBookingService
             Origin: request.Origin,
             Destination: request.Destination,
             DepartureTime: request.DepartureTime,
-            // ArrivalTime now comes from the client (selected from real search results).
             ArrivalTime: request.ArrivalTime,
             CabinClass: request.CabinClass,
-            // BasePrice is not relevant for the booking confirmation; TotalPrice is used.
-            BasePrice: 0m);
+            BasePrice: 0m); // BasePrice is irrelevant post-booking; TotalPrice is the source of truth.
 
         var passengers = request.Passengers
             .Select(p => new Passenger(p.FirstName, p.LastName, p.DateOfBirth, p.DocumentType, p.DocumentNumber))
@@ -59,6 +72,11 @@ public class BookingService : IBookingService
             CreatedAt: DateTime.UtcNow);
 
         await _bookingRepository.AddBooking(booking, ct);
+
+        _logger.LogInformation(
+            "Booking confirmed — reference: {ReferenceCode}, flight: {FlightNumber}, total: {Total} {Currency}",
+            booking.ReferenceCode, booking.Flight.FlightNumber,
+            booking.TotalPrice, booking.Currency);
 
         return new BookingResponse(
             booking.Id,
@@ -81,6 +99,10 @@ public class BookingService : IBookingService
     {
         foreach (var passenger in request.Passengers)
         {
+            _logger.LogDebug(
+                "Validating document for passenger {FirstName} {LastName} — type: {DocumentType}",
+                passenger.FirstName, passenger.LastName, passenger.DocumentType);
+
             var result = _documentValidator.Validate(
                 passenger.DocumentNumber,
                 passenger.DocumentType,
@@ -88,7 +110,13 @@ public class BookingService : IBookingService
                 request.Destination);
 
             if (!result.IsValid)
+            {
+                _logger.LogWarning(
+                    "Document validation failed — passenger: {FirstName} {LastName}, reason: {Error}",
+                    passenger.FirstName, passenger.LastName, result.Error);
+
                 throw new ArgumentException(result.Error ?? "Invalid document.");
+            }
         }
     }
 

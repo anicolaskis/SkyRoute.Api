@@ -9,6 +9,15 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.6" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="10.1.7" />
+    <!-- NLog: file + console logging with rolling daily files -->
+    <PackageReference Include="NLog.Web.AspNetCore" Version="5.3.15" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- nlog.config must be present at runtime; copy it alongside the binary -->
+    <None Update="nlog.config">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
