@@ -1,3 +1,5 @@
+using SkyRoute.Domain.Abstractions;
+
 namespace SkyRoute.Infrastructure.Mocks;
 
 // Simulated flight data source.
@@ -6,5 +8,7 @@ namespace SkyRoute.Infrastructure.Mocks;
 // implementations: from JSON, in-memory, random, or even a fake HTTP.
 public interface IMockFlightDataSource
 {
-    // Pending members: ProviderName, GetTemplates().
+    public string ProviderName { get; }
+
+    IEnumerable<FlightTemplate> GetTemplates();
 }

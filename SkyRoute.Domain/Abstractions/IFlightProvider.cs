@@ -1,3 +1,5 @@
+using SkyRoute.Domain.Models;
+
 namespace SkyRoute.Domain.Abstractions;
 
 // Contract for an external flight provider (GlobalAir, BudgetWings, SkyWings, ...).
@@ -6,5 +8,7 @@ namespace SkyRoute.Domain.Abstractions;
 // Lives in Domain because it expresses a business rule, not a technical detail.
 public interface IFlightProvider
 {
-    // Pending members: Name (identifies the provider), SearchAsync (returns offers).
+    string ProviderName { get; }
+
+    Task<IEnumerable<FlightOffer>> SearchAsync(SearchCriteria criteria, CancellationToken ct = default);
 }

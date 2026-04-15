@@ -1,3 +1,5 @@
-// Archivo de datos mock de BudgetWings.
-// Cada objeto sigue la forma de FlightTemplate.
-// Editable sin recompilar: se copia al output del Api.
+[
+  { "flightNumber": "BW42", "departureHourOffset": 6,  "durationHours": 3, "basePrice": 180, "availableSeats": 30 },
+  { "flightNumber": "BW77", "departureHourOffset": 20, "durationHours": 3, "basePrice": 150, "availableSeats": 10 },
+  { "flightNumber": "BW99", "departureHourOffset": 11, "durationHours": 2, "basePrice": 95,  "availableSeats": 25 }
+]

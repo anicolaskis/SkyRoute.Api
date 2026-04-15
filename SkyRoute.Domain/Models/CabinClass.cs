@@ -4,5 +4,9 @@ namespace SkyRoute.Domain.Models;
 // Lives in Domain because it is a business rule: the possible values do not depend on any framework.
 public enum CabinClass
 {
-    // Values pending implementation.
+    Economy,
+
+    Business,
+
+    First
 }

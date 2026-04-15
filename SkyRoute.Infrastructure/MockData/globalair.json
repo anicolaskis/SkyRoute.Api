@@ -1,3 +1,5 @@
-// Archivo de datos mock de GlobalAir.
-// Cada objeto sigue la forma de FlightTemplate.
-// Editable sin recompilar: se copia al output del Api.
+[
+  { "flightNumber": "GA101", "departureHourOffset": 8,  "durationHours": 3, "basePrice": 250, "availableSeats": 20 },
+  { "flightNumber": "GA205", "departureHourOffset": 14, "durationHours": 3, "basePrice": 300, "availableSeats": 15 },
+  { "flightNumber": "GA330", "departureHourOffset": 19, "durationHours": 4, "basePrice": 275, "availableSeats": 8  }
+]

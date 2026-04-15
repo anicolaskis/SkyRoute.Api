@@ -1,3 +1,5 @@
+using SkyRoute.Domain.Models;
+
 namespace SkyRoute.Application.Services;
 
 // Implementation of the search use case.
@@ -9,7 +11,10 @@ namespace SkyRoute.Application.Services;
 //   2. Captures errors per provider (one down doesn't break the search).
 //   3. Applies the corresponding strategy to each offer to calculate the final price.
 //   4. Returns the unified list ordered by price.
-public class FlightSearchService
+public class FlightSearchService : IFlightSearchService
 {
-    // Implementation pending.
+    public Task<IEnumerable<PricedFlightOffer>> SearchFlightsOnProviders(SearchCriteria criteria, CancellationToken ct = default)
+    {
+        throw new NotImplementedException();
+    }
 }

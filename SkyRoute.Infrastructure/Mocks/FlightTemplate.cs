@@ -4,8 +4,10 @@ namespace SkyRoute.Infrastructure.Mocks;
 // Times are expressed as OFFSETS relative to the search date,
 // so the same JSON works for any day.
 // Base price and seats are fixed per template.
-public record FlightTemplate
-{
-    // Pending properties: FlightNumber, DepartureHourOffset, DurationHours,
-    // BasePrice, AvailableSeats.
-}
+public record FlightTemplate(
+    string FlightNumber,
+    int DepartureHourOffset,
+    int DurationHours,
+    decimal BasePrice,
+    int AvailableSeats
+);
