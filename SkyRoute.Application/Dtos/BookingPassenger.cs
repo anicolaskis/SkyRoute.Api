@@ -7,6 +7,7 @@ namespace SkyRoute.Application.Dtos;
 public record BookingPassenger(
     string FirstName,
     string LastName,
+    string Email,
     DateTime DateOfBirth,
     DocumentType DocumentType,
     string DocumentNumber

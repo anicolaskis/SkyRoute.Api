@@ -58,7 +58,7 @@ public class BookingService : IBookingService
             BasePrice: 0m); // BasePrice is irrelevant post-booking; TotalPrice is the source of truth.
 
         var passengers = request.Passengers
-            .Select(p => new Passenger(p.FirstName, p.LastName, p.DateOfBirth, p.DocumentType, p.DocumentNumber))
+            .Select(p => new Passenger(p.FirstName, p.LastName, p.Email, p.DateOfBirth, p.DocumentType, p.DocumentNumber))
             .ToList();
 
         var booking = new Booking(
