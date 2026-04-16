@@ -184,7 +184,7 @@ cd SkyRoute.Api/SkyRoute.Api
 dotnet run
 ```
 
-The API starts on `http://localhost:5054` by default. Swagger UI is available at `/swagger` in development mode.
+The API starts on `http://localhost:5000` by default. Swagger UI is available at `/swagger` in development mode.
 
 ### Frontend
 
