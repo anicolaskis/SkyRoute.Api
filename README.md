@@ -2,6 +2,161 @@
 
 A flight search and booking API built with .NET 10, backed by an Angular 19 frontend. The project demonstrates Clean Architecture, SOLID principles, and testable system design.
 
+------
+### ⚠️ Important
+---
+
+# Personal Notes and Reflections regarding my work process
+
+## Engineering Approach
+
+Given the time constraint (3–4 hours), my goal was to prioritize **clarity, correctness, and architectural soundness** over completeness or over-engineering.
+
+### 1. Initial Analysis & Strategy
+
+I started by carefully analyzing the requirements and identifying the key challenges behind the exercise:
+
+* Multiple providers with different pricing rules (extensibility problem)
+* Separation of concerns between API, application logic, and domain rules
+* A simple but coherent booking flow with dynamic validation
+* A frontend that is functional but not unnecessarily complex
+
+Before writing code, I defined a **clear architectural approach** focused on:
+
+* Maintainability
+* Extensibility (new providers)
+* Explicit and explainable design decisions
+
+---
+
+### 2. AI-Assisted Development Workflow
+
+AI tools were used intentionally as a **productivity accelerator**, not as a decision-maker.
+
+My workflow was:
+
+1. I designed the architecture and approach first.
+2. Then I generated a **structured prompt** to guide the AI according to those decisions.
+3. I asked for:
+
+   * A full project skeleton (folders, files, namespaces, responsibilities)
+   * A parallel implementation with working code
+
+This allowed me to:
+
+* Avoid boilerplate work
+* Focus on validating design decisions instead of writing repetitive code
+
+---
+
+### 3. Code Ownership & Iteration
+
+All core parts of the system were **reviewed, adjusted, and refined manually**.
+
+I went through the implementation **class by class**, improving or rewriting parts that did not align with the intended design.
+
+For example:
+
+* The provider mocks were redesigned to better reflect realistic behavior
+* Pricing logic was adjusted to ensure clear separation and correctness
+* Responsibilities between layers were refined
+
+I also used `TODO` markers to identify areas where alternative approaches could be explored later.
+
+---
+
+### 4. Development Order
+
+To reduce complexity and risk, I implemented the system in stages:
+
+1. Flight search flow (core domain + provider integration)
+2. Booking flow (including validation and data handling)
+3. API exposure and testing via Swagger
+4. Cross-cutting concerns:
+
+   * CORS configuration
+   * Logging
+5. Frontend implementation (minimal, functional, requirement-driven)
+
+---
+
+### 5. Backend Focus
+
+Given the nature of the challenge, I intentionally invested more time in the backend:
+
+* Each service, interface, and class was reviewed and aligned with the architecture
+* Extensibility (e.g., adding new providers) was treated as a first-class concern
+* Business rules were kept isolated from delivery concerns
+
+---
+
+### 6. Frontend Approach
+
+The frontend was implemented as a **minimal and functional UI**, strictly aligned with the requirements.
+
+No unnecessary complexity (state management libraries, advanced patterns, etc.) was introduced, in order to keep the solution:
+
+* Understandable
+* Maintainable
+* Easy to explain during the review
+
+---
+
+### 7. Testing Strategy
+
+I included both:
+
+* Unit tests (business logic and services)
+* Integration tests (API behavior)
+
+The test structure and scenarios were defined first, and then implemented with AI assistance, ensuring coverage of the main flows and edge cases.
+
+---
+
+### 8. Documentation & Diagrams
+
+The documentation includes:
+
+* Architecture decisions
+* System workflow
+* Use cases
+* Sequence and flow diagrams (Mermaid)
+
+This was generated based on the actual implementation and reviewed to ensure consistency.
+
+---
+
+### 9. Time & Trade-offs
+
+The full solution was developed in approximately **4 hours using AI-assisted workflows**.
+
+Some improvements that could be made with more time:
+
+* Stronger validation and error handling
+* More realistic provider simulation
+* Enhanced UI/UX
+* Further test coverage and edge cases
+
+---
+
+### 10. Effort Estimation (Without AI)
+
+Based on the scope and implementation level, a similar solution without AI assistance would reasonably take:
+
+* Backend (architecture + implementation): 2–3 days
+* Frontend (Angular, non-specialist): 4–6 days
+* Testing (unit + integration): 3–4 days
+* Documentation: 0.5–1 day
+
+**Total: ~10–15 working days for a single developer**
+
+AI significantly reduced time spent on boilerplate and setup, allowing focus on:
+
+* Architecture
+* Validation of logic
+* Decision-making
+
+---
 ---
 
 ## What it does
