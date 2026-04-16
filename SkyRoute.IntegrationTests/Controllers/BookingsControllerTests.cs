@@ -3,6 +3,7 @@ using System.Text.Json;
 using FluentAssertions;
 using SkyRoute.Domain.Models;
 using SkyRoute.IntegrationTests.Infrastructure;
+using Xunit;
 
 namespace SkyRoute.IntegrationTests.Controllers;
 

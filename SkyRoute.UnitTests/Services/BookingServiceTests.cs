@@ -5,6 +5,7 @@ using SkyRoute.Application.Dtos;
 using SkyRoute.Application.Services;
 using SkyRoute.Domain.Abstractions;
 using SkyRoute.Domain.Models;
+using Xunit;
 
 namespace SkyRoute.UnitTests.Services;
 
@@ -48,16 +49,20 @@ public class BookingServiceTests
         Mock<IDocumentValidator>? validator = null)
     {
         repo ??= new Mock<IBookingRepository>();
-        validator ??= new Mock<IDocumentValidator>();
 
-        // Default: validator returns valid for all calls
-        validator
-            .Setup(v => v.Validate(
-                It.IsAny<string>(),
-                It.IsAny<DocumentType>(),
-                It.IsAny<string>(),
-                It.IsAny<string>()))
-            .Returns(new DocumentValidationResult(true, DocumentType.Passport, null));
+        // Only apply the default "always valid" setup when no pre-configured validator
+        // was supplied by the caller. If the caller passed one in, honour its setup as-is.
+        if (validator is null)
+        {
+            validator = new Mock<IDocumentValidator>();
+            validator
+                .Setup(v => v.Validate(
+                    It.IsAny<string>(),
+                    It.IsAny<DocumentType>(),
+                    It.IsAny<string>(),
+                    It.IsAny<string>()))
+                .Returns(new DocumentValidationResult(true, DocumentType.Passport, null));
+        }
 
         var logger = Mock.Of<ILogger<BookingService>>();
         return new BookingService(repo.Object, validator.Object, logger);

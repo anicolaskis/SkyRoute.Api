@@ -1,6 +1,7 @@
 using FluentAssertions;
 using SkyRoute.Domain.Models;
 using SkyRoute.Infrastructure.Pricing;
+using Xunit;
 
 namespace SkyRoute.UnitTests.Pricing;
 
