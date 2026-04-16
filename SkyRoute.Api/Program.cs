@@ -10,8 +10,6 @@ using SkyRoute.Infrastructure.Providers;
 
 // ── Bootstrap logger ──────────────────────────────────────────────────────────
 // Initialised from nlog.config before the host is built.
-// This ensures that errors during DI registration or configuration loading
-// are written to the file and not silently swallowed.
 var logger = LogManager.Setup()
                        .LoadConfigurationFromFile("nlog.config")
                        .GetCurrentClassLogger();
@@ -69,7 +67,13 @@ try
                   .AllowAnyMethod());
     });
 
-    builder.Services.AddControllers();
+    builder.Services.AddControllers()
+        .AddJsonOptions(options =>
+        {
+            // Accept and return enums as strings ("Economy", "Business", "First")
+            options.JsonSerializerOptions.Converters.Add(
+                new System.Text.Json.Serialization.JsonStringEnumConverter());
+        });
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddSwaggerGen();
 
@@ -92,14 +96,14 @@ try
 }
 catch (Exception ex)
 {
-    // Fatal: the host could not start (misconfigured DI, missing file, port conflict, etc.).
-    // Written to the file via the bootstrap logger so the failure is not lost.
     logger.Fatal(ex, "SkyRoute API failed to start");
     throw; // Re-throw so the OS / process supervisor receives a non-zero exit code.
 }
 finally
 {
-    // Flush and release all NLog file handles before the process exits.
-    // Without this, the last buffered entries may not reach the file.
     LogManager.Shutdown();
 }
+
+// Makes the implicit Program class visible to WebApplicationFactory<Program>
+// in the integration test project (required for top-level statement programs).
+public partial class Program { }
